@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Project Hub - Student Portals</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #111;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: #000;
+            color: #fff;
+            padding: 12px 24px;
+            display: inline-block;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0px 0px #ff3366;
+            transform: rotate(-1deg);
+        }
+        .header p {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .card {
+            background: #fff;
+            border: 4px solid #000;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 8px 8px 0px 0px #000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px 0px #000;
+        }
+        .card-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 900;
+            border: 3px solid #000;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+        .card h2 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .card p {
+            font-size: 0.95rem;
+            color: #444;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .card-btn {
+            background: #000;
+            color: #fff;
+            padding: 10px 18px;
+            font-weight: 900;
+            text-align: center;
+            border: 3px solid #000;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+        }
+
+        /* Student Card Themes */
+        .card-rahul .card-tag { background: #f4d03f; }
+        .card-rahul .card-btn { background: #ff3366; color: #000; }
+        
+        .card-sourabh .card-tag { background: #a78bfa; }
+        .card-sourabh .card-btn { background: #10b981; color: #fff; }
+
+        .card-rohit .card-tag { background: #ff6b6b; color: #fff; }
+        .card-rohit .card-btn { background: #ffa502; color: #000; }
+
+        .card-kartik .card-tag { background: #26de81; }
+        .card-kartik .card-btn { background: #eb3b5a; color: #fff; }
+
+        .card-anmol .card-tag { background: #3867d6; color: #fff; }
+        .card-anmol .card-btn { background: #fa8231; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Mini Project Showcase Hub</h1>
+        <p>Interactive Neobrutalist Web Portals for 5 Students</p>
+    </div>
+
+    <div class="grid">
+        <a href="rahul/login.html" class="card card-rahul">
+            <div>
+                <span class="card-tag">OWNER: RAHUL</span>
+                <h2>Saskar College</h2>
+                <p>Cyber Yellow & Hot Pink Neobrutalism theme with system login flow.</p>
+            </div>
+            <div class="card-btn">Open Rahul's Portal &rarr;</div>
+        </a>
+
+        <a href="sourabh/login.html" class="card card-sourabh">
+            <div>
+                <span class="card-tag">OWNER: SOURABH</span>
+                <h2>Matrix Institute</h2>
+                <p>Cyber-Lavender & Mint Emerald theme with cadet security access.</p>
+            </div>
+            <div class="card-btn">Open Sourabh's Portal &rarr;</div>
+        </a>
+
+        <a href="rohit/login.html" class="card card-rohit">
+            <div>
+                <span class="card-tag">OWNER: ROHIT</span>
+                <h2>Ignite Tech Academy</h2>
+                <p>Sunset Coral & Golden Amber flame theme with scholar authentication.</p>
+            </div>
+            <div class="card-btn">Open Rohit's Portal &rarr;</div>
+        </a>
+
+        <a href="kartik/login.html" class="card card-kartik">
+            <div>
+                <span class="card-tag">OWNER: KARTIK</span>
+                <h2>Apex Global</h2>
+                <p>Fresh Mint Emerald & Crimson Ruby theme with researcher gateway.</p>
+            </div>
+            <div class="card-btn">Open Kartik's Portal &rarr;</div>
+        </a>
+
+        <a href="anmol/login.html" class="card card-anmol">
+            <div>
+                <span class="card-tag">OWNER: ANMOL</span>
+                <h2>Horizon University</h2>
+                <p>Royal Cobalt Blue & Tangerine Orange theme with student portal access.</p>
+            </div>
+            <div class="card-btn">Open Anmol's Portal &rarr;</div>
+        </a>
+    </div>
+</body>
+</html>
