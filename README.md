@@ -1,8 +1,8 @@
-# 🎓 College Mini Project Hub (Student Portals)
+# 🎓 College Mini Project Hub (Simple Web Projects)
 
 A collection of 7 distinct, responsive college portal websites built with **Neobrutalism UI design** (bold borders, offset drop-shadows, retro badges, and high-contrast color palettes).
 
-Each student has their own folder with their own `index.html` entry point, custom branding, unique color palettes, and personal owner badges.
+Each student has their own folder with a different beginner-friendly browser project. Every project runs by opening its `index.html` file directly.
 
 ---
 
@@ -59,17 +59,17 @@ college-mini-project/
 
 ---
 
-## 🎨 Student Projects & Themes
+## 🎨 Student Projects
 
 | Student | Directory | College / Portal Name | Theme Palette | Owner Badge |
 |---|---|---|---|---|
-| **Rahul** | `rahul/` | **Saskar College** | Cyber Yellow (`#f4d03f`) & Hot Pink (`#ff3366`) | `OWNER: RAHUL` |
-| **Sourabh** | `sourabh/` | **Matrix Institute** | Cyber Lavender (`#a78bfa`) & Emerald Mint (`#10b981`) | `OWNER: SOURABH` |
-| **Rohit** | `rohit/` | **Ignite Tech Academy** | Sunset Coral (`#ff6b6b`) & Golden Amber (`#ffa502`) | `OWNER: ROHIT` |
-| **Kartik** | `kartik/` | **Apex Global** | Fresh Mint (`#26de81`) & Crimson Ruby (`#eb3b5a`) | `OWNER: KARTIK` |
-| **Anmol** | `anmol/` | **Horizon University** | Cobalt Blue (`#3867d6`) & Tangerine (`#fa8231`) | `OWNER: ANMOL` |
-| **Satyakam** | `satyakam/` | **Titan Institute** | Electric Violet (`#6c5ce7`) & Turquoise (`#00cec9`) | `OWNER: SATYAKAM` |
-| **Aakib** | `aakib/` | **Nexus Polytechnic** | Sunburst Amber (`#f39c12`) & Royal Violet (`#8e44ad`) | `OWNER: AAKIB` |
+| **Rahul** | `rahul/` | Calculator | Number operations |
+| **Sourabh** | `sourabh/` | Weather Card | City and temperature card |
+| **Rohit** | `rohit/` | Notes App | Create and delete notes |
+| **Kartik** | `kartik/` | Digital Clock | Live time and date |
+| **Anmol** | `anmol/` | To-Do List | Add and remove tasks |
+| **Satyakam** | `satyakam/` | Expense Tracker | Add expenses and total |
+| **Aakib** | `aakib/` | Quiz | Multiple-choice quiz |
 
 ---
 
