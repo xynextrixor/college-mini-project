@@ -1,65 +1,65 @@
-# 🎓 College Mini Project Hub (Simple Web Projects)
+﻿# ðŸŽ“ College Mini Project Hub (Simple Web Projects)
 
 A collection of 7 distinct, responsive college portal websites built with **Neobrutalism UI design** (bold borders, offset drop-shadows, retro badges, and high-contrast color palettes).
 
-Each student has their own folder with a different beginner-friendly browser project. Every project runs by opening its `index.html` file directly.
+Each student has their own folder with a different beginner-friendly browser project. Every project has a clear filename and runs by opening its HTML file directly.
 
 ---
 
-## 📁 Project Structure
+## ðŸ“ Project Structure
 
 ```text
 college-mini-project/
-│
-├── index.html              # Main Hub / Showcase linking all 7 portals
-├── README.md               # Documentation & usage guide
-│
-├── rahul/                  # Rahul's Portal (Saskar College)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-├── sourabh/                # Sourabh's Portal (Matrix Institute)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-├── rohit/                  # Rohit's Portal (Ignite Tech Academy)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-├── kartik/                 # Kartik's Portal (Apex Global)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-├── anmol/                  # Anmol's Portal (Horizon University)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-├── satyakam/               # Satyakam's Portal (Titan Institute)
-│   ├── index.html          # Main Login Entry
-│   ├── signup.html
-│   ├── welcome.html
-│   └── style.css
-│
-└── aakib/                  # Aakib's Portal (Nexus Polytechnic)
-    ├── index.html          # Main Login Entry
-    ├── signup.html
-    ├── welcome.html
-    └── style.css
+â”‚
+â”œâ”€â”€ index.html              # Main Hub / Showcase linking all 7 portals
+â”œâ”€â”€ README.md               # Documentation & usage guide
+â”‚
+â”œâ”€â”€ rahul/                  # Rahul's Portal (Saskar College)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â”œâ”€â”€ sourabh/                # Sourabh's Portal (Matrix Institute)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â”œâ”€â”€ rohit/                  # Rohit's Portal (Ignite Tech Academy)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â”œâ”€â”€ kartik/                 # Kartik's Portal (Apex Global)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â”œâ”€â”€ anmol/                  # Anmol's Portal (Horizon University)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â”œâ”€â”€ satyakam/               # Satyakam's Portal (Titan Institute)
+â”‚   â”œâ”€â”€ index.html          # Main Project
+â”‚   â”œâ”€â”€ signup.html
+â”‚   â”œâ”€â”€ welcome.html
+â”‚   â””â”€â”€ style.css
+â”‚
+â””â”€â”€ aakib/                  # Aakib's Portal (Nexus Polytechnic)
+    â”œâ”€â”€ index.html          # Main Project
+    â”œâ”€â”€ signup.html
+    â”œâ”€â”€ welcome.html
+    â””â”€â”€ style.css
 ```
 
 ---
 
-## 🎨 Student Projects
+## ðŸŽ¨ Student Projects
 
 | Student | Directory | College / Portal Name | Theme Palette | Owner Badge |
 |---|---|---|---|---|
@@ -73,7 +73,7 @@ college-mini-project/
 
 ---
 
-## 🚀 How to Use / Run This Project
+## ðŸš€ How to Use / Run This Project
 
 ### Method 1: Open the Main Hub
 1. Open the project root folder.
@@ -81,16 +81,17 @@ college-mini-project/
 3. Click any student's card to jump directly into their portal.
 
 ### Method 2: Open Any Student's Folder Directly
-Because every folder contains its own `index.html`, opening the folder or launching `index.html` directly loads that student's portal:
-- **Rahul:** `rahul/index.html`
-- **Sourabh:** `sourabh/index.html`
-- **Rohit:** `rohit/index.html`
-- **Kartik:** `kartik/index.html`
-- **Anmol:** `anmol/index.html`
-- **Satyakam:** `satyakam/index.html`
-- **Aakib:** `aakib/index.html`
+Open the named HTML file in each folder to launch that student's project:
+- **Rahul:** `rahul/calculator.html`
+- **Sourabh:** `sourabh/weather-card.html`
+- **Rohit:** `rohit/notes-app.html`
+- **Kartik:** `kartik/digital-clock.html`
+- **Anmol:** `anmol/todo-list.html`
+- **Satyakam:** `satyakam/expense-tracker.html`
+- **Aakib:** `aakib/quiz.html`
 
-### 🔄 Navigation Flow in Each Portal:
+### ðŸ”„ Navigation Flow in Each Portal:
 1. **Login Page (`index.html`)**: Enter credentials and click **Login / Enter** to access the dashboard.
 2. **Signup Page (`signup.html`)**: Enter registration details and click submit to return to `index.html`.
 3. **Welcome Page (`welcome.html`)**: Confirms session activation with a **Logout** button linking back to `index.html`.
+
