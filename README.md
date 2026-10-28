@@ -13,7 +13,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Anmol | `anmol/todo-list.html` | To-do list |
 | Satyakam | `satyakam/expense-tracker.html` | Expense tracker |
 | Aakib | `aakib/quiz.html` | Quiz |
-| Deepak | `deepak/color-picker.html` | Color picker |
+| Deepak | `deepak/mood-generator.html` | Mood generator |
 
 ## How to use
 
