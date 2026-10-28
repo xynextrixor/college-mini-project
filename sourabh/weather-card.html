@@ -1,1 +1,75 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sourabh - Weather</title><style>body{font:18px Arial;background:#cffafe;padding:30px;text-align:center}.box{max-width:500px;margin:auto;background:white;padding:30px;border:3px solid #0e7490;border-radius:15px}input,button{padding:10px}#temp{font-size:50px;color:#0e7490}</style></head><body><main class="box"><h1>Sourabh's Weather Card</h1><form id="f"><input id="city" placeholder="City" required><button>Check</button></form><h2 id="place">Your City</h2><div id="temp">25°C</div><p>Sunny and pleasant</p></main><script>f.onsubmit=e=>{e.preventDefault();place.textContent=city.value;temp.textContent=Math.floor(18+Math.random()*15)+'°C'}</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sourabh - Live Weather</title>
+  <style>
+    body{font:18px Arial;background:#cffafe;margin:0;padding:30px;text-align:center;color:#164e63}
+    .box{max-width:500px;margin:auto;background:#fff;padding:30px;border:3px solid #0e7490;border-radius:15px;box-shadow:8px 8px #67e8f9}
+    input,button{width:100%;padding:11px;margin:6px 0;box-sizing:border-box;font:inherit;border:2px solid #0e7490;border-radius:7px}
+    button{background:#0e7490;color:#fff;font-weight:bold;cursor:pointer}
+    .hint{font-size:.8rem;color:#475569;text-align:left}
+    #weather{margin-top:20px}
+    #temp{font-size:50px;color:#0e7490;font-weight:bold}
+    #message{min-height:24px}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <p>SOURABH'S MINI PROJECT</p>
+    <h1>Live Weather</h1>
+    <form id="form">
+      <input id="apiKey" type="password" placeholder="OpenWeather API key" autocomplete="off" required>
+      <input id="city" placeholder="Enter city name" required>
+      <button>Get live weather</button>
+    </form>
+    <p class="hint">Your API key is saved only in this browser and is never included in the project code.</p>
+    <section id="weather" hidden>
+      <h2 id="place"></h2>
+      <div id="temp"></div>
+      <p id="description"></p>
+    </section>
+    <p id="message"></p>
+  </main>
+  <script>
+    const form = document.querySelector('#form');
+    const apiKey = document.querySelector('#apiKey');
+    const city = document.querySelector('#city');
+    const weather = document.querySelector('#weather');
+    const place = document.querySelector('#place');
+    const temp = document.querySelector('#temp');
+    const description = document.querySelector('#description');
+    const message = document.querySelector('#message');
+
+    apiKey.value = localStorage.getItem('openWeatherApiKey') || '';
+
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const key = apiKey.value.trim();
+      const selectedCity = city.value.trim();
+      if (!key || !selectedCity) return;
+
+      localStorage.setItem('openWeatherApiKey', key);
+      message.textContent = 'Loading live weather...';
+      weather.hidden = true;
+
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(selectedCity)}&appid=${encodeURIComponent(key)}&units=metric`
+        );
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Weather request failed');
+
+        place.textContent = `${data.name}, ${data.sys.country}`;
+        temp.textContent = `${Math.round(data.main.temp)}°C`;
+        description.textContent = `${data.weather[0].description} | Feels like ${Math.round(data.main.feels_like)}°C`;
+        weather.hidden = false;
+        message.textContent = '';
+      } catch (error) {
+        message.textContent = `Unable to load weather: ${error.message}. Check the city and API key.`;
+      }
+    };
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Student | Folder and file | Project |
 |---|---|---|
 | Rahul | `rahul/calculator.html` | Calculator |
-| Sourabh | `sourabh/weather-card.html` | Weather card |
+| Sourabh | `sourabh/weather-card.html` | Live weather card using OpenWeather |
 | Rohit | `rohit/notes-app.html` | Notes app |
 | Kartik | `kartik/digital-clock.html` | Digital clock |
 | Anmol | `anmol/todo-list.html` | To-do list |
