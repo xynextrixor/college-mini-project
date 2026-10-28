@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deepak - Unit Converter</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#eff6ff;color:#1e3a8a;display:grid;place-items:center;min-height:100vh;margin:0;padding:20px}
+    .box{background:#fff;border:3px solid #2563eb;border-radius:16px;padding:28px;width:min(440px,90%);box-shadow:8px 8px #93c5fd}
+    input,select,button{width:100%;padding:12px;margin:7px 0;border:2px solid #2563eb;border-radius:8px;font:inherit}
+    button{background:#2563eb;color:#fff;font-weight:bold;cursor:pointer}
+    #result{background:#dbeafe;border-radius:8px;padding:16px;margin-top:15px;text-align:center;font-size:1.3rem;font-weight:bold}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <p>DEEPAK'S MINI PROJECT</p>
+    <h1>Unit Converter</h1>
+    <input id="value" type="number" placeholder="Enter a value">
+    <select id="type">
+      <option value="km">Kilometers to Miles</option>
+      <option value="miles">Miles to Kilometers</option>
+      <option value="kg">Kilograms to Pounds</option>
+      <option value="c">Celsius to Fahrenheit</option>
+    </select>
+    <button id="convert">Convert</button>
+    <div id="result">Your result will appear here</div>
+  </main>
+  <script>
+    const value = document.querySelector('#value');
+    const type = document.querySelector('#type');
+    const result = document.querySelector('#result');
+    document.querySelector('#convert').onclick = () => {
+      const number = Number(value.value);
+      if (value.value === '') {
+        result.textContent = 'Please enter a value.';
+        return;
+      }
+      const conversions = {
+        km: [number * 0.621371, 'miles'],
+        miles: [number * 1.60934, 'kilometers'],
+        kg: [number * 2.20462, 'pounds'],
+        c: [(number * 9 / 5) + 32, '°F']
+      };
+      result.textContent = `${conversions[type.value][0].toFixed(2)} ${conversions[type.value][1]}`;
+    };
+  </script>
+</body>
+</html>
