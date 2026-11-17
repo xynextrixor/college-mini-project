@@ -51,9 +51,18 @@
 
     .modes {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
       margin-bottom: 28px;
+    }
+
+    .mode-group {
+      width: 100%;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
     }
 
     button {
@@ -132,9 +141,15 @@
     <p class="subtitle">Focus in short, productive sessions.</p>
 
     <div class="modes" aria-label="Timer modes">
-      <button class="mode active" data-minutes="25">Focus</button>
-      <button class="mode" data-minutes="5">Short Break</button>
-      <button class="mode" data-minutes="15">Long Break</button>
+      <div class="mode-group">Focus duration</div>
+      <button class="mode active" data-minutes="15" data-label="15-minute focus">15 min</button>
+      <button class="mode" data-minutes="25" data-label="25-minute focus">25 min</button>
+      <button class="mode" data-minutes="50" data-label="50-minute focus">50 min</button>
+      <button class="mode" data-minutes="90" data-label="90-minute focus">90 min</button>
+
+      <div class="mode-group">Break duration</div>
+      <button class="mode" data-minutes="5" data-label="Short break">Short Break</button>
+      <button class="mode" data-minutes="15" data-label="Long break">Long Break</button>
     </div>
 
     <div class="progress-ring">
@@ -156,7 +171,7 @@
     const resetButton = document.getElementById("reset");
     const modeButtons = document.querySelectorAll(".mode");
 
-    let duration = 25 * 60;
+    let duration = 15 * 60;
     let remaining = duration;
     let timerId = null;
 
@@ -172,7 +187,7 @@
       duration = Number(button.dataset.minutes) * 60;
       remaining = duration;
       stopTimer();
-      statusElement.textContent = "Ready to focus?";
+      statusElement.textContent = `${button.dataset.label} selected.`;
       render();
     }
 
