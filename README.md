@@ -14,6 +14,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Satyakam | `satyakam/expense-tracker.html` | Expense tracker |
 | Aakib | `aakib/quiz.html` | Quiz |
 | Deepak | `deepak/unit-converter.html` | Unit converter |
+| Lalit | `lalit/pomodoro-timer.html` | Pomodoro timer with multiple focus durations |
 
 ## How to use
 
