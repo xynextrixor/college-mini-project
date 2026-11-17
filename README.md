@@ -9,7 +9,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Rahul | `rahul/calculator.html` | Calculator |
 | Sourabh | `sourabh/weather-card.html` | Live weather card using OpenWeather |
 | Rohit | `rohit/notes-app.html` | Notes app |
-| Kartik | `kartik/digital-clock.html` | Digital clock |
+| Kartik | `kartik/digital-clock.html` | Dynamic clock with searchable draggable map |
 | Anmol | `anmol/todo-list.html` | To-do list |
 | Satyakam | `satyakam/expense-tracker.html` | Expense tracker |
 | Aakib | `aakib/quiz.html` | Quiz |
