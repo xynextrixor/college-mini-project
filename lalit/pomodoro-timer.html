@@ -117,6 +117,26 @@
       font-weight: 700;
     }
 
+    .custom-time {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin: -8px 0 20px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .custom-time input {
+      width: 82px;
+      padding: 10px;
+      border: 2px solid var(--track);
+      border-radius: 999px;
+      color: var(--text);
+      font: inherit;
+      text-align: center;
+    }
+
     .controls {
       display: flex;
       gap: 12px;
@@ -152,6 +172,12 @@
       <button class="mode" data-minutes="15" data-label="Long break">Long Break</button>
     </div>
 
+    <div class="custom-time">
+      <label for="custom-minutes">Need another timing?</label>
+      <input id="custom-minutes" type="number" min="1" max="180" placeholder="Minutes">
+      <button id="set-custom">Set</button>
+    </div>
+
     <div class="progress-ring">
       <div class="time" id="time">25:00</div>
     </div>
@@ -169,6 +195,8 @@
     const statusElement = document.getElementById("status");
     const startButton = document.getElementById("start");
     const resetButton = document.getElementById("reset");
+    const customMinutesInput = document.getElementById("custom-minutes");
+    const setCustomButton = document.getElementById("set-custom");
     const modeButtons = document.querySelectorAll(".mode");
 
     let duration = 15 * 60;
@@ -226,9 +254,27 @@
       render();
     }
 
+    function setCustomTime() {
+      const minutes = Number(customMinutesInput.value);
+
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) {
+        statusElement.textContent = "Enter a whole number from 1 to 180.";
+        customMinutesInput.focus();
+        return;
+      }
+
+      modeButtons.forEach((mode) => mode.classList.remove("active"));
+      duration = minutes * 60;
+      remaining = duration;
+      stopTimer();
+      statusElement.textContent = `${minutes}-minute custom focus selected.`;
+      render();
+    }
+
     modeButtons.forEach((button) => button.addEventListener("click", () => setMode(button)));
     startButton.addEventListener("click", startTimer);
     resetButton.addEventListener("click", resetTimer);
+    setCustomButton.addEventListener("click", setCustomTime);
     render();
   </script>
 </body>
