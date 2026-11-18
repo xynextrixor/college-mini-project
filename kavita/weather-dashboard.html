@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kavita - Weather Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {
       --navy: #102a43;
@@ -245,6 +246,85 @@
       font-size: 0.8rem;
     }
 
+    .map-section {
+      margin-top: 26px;
+      padding: 22px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(16, 42, 67, 0.08);
+    }
+
+    .map-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .map-heading h2 {
+      margin-bottom: 5px;
+    }
+
+    .map-heading p {
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .map-search {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .map-search input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    #map {
+      height: 360px;
+      overflow: hidden;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .map-info {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .map-info-item {
+      padding: 11px;
+      background: #f7fbff;
+      border-radius: 10px;
+    }
+
+    .map-info-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .map-info-value {
+      display: block;
+      overflow: hidden;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 700px) {
+      .map-info {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 850px) {
       header {
         align-items: stretch;
@@ -324,9 +404,31 @@
       <div class="forecast" id="forecast"></div>
     </section>
 
+    <section class="map-section">
+      <div class="map-heading">
+        <div>
+          <h2>Explore any location</h2>
+          <p>Search a place, click anywhere on the map, or drag the marker.</p>
+        </div>
+        <button class="tool-button" id="map-weather-button" type="button">Load weather here</button>
+      </div>
+      <form class="map-search" id="map-search-form">
+        <input id="map-search-input" type="search" placeholder="Search country, city, or landmark" aria-label="Search a map location">
+        <button type="submit">Find</button>
+      </form>
+      <div id="map" aria-label="Interactive world map"></div>
+      <div class="map-info">
+        <div class="map-info-item"><span class="map-info-label">Place</span><strong class="map-info-value" id="map-place">Select a location</strong></div>
+        <div class="map-info-item"><span class="map-info-label">Country</span><strong class="map-info-value" id="map-country">-</strong></div>
+        <div class="map-info-item"><span class="map-info-label">Coordinates</span><strong class="map-info-value" id="map-coordinates">-</strong></div>
+        <div class="map-info-item"><span class="map-info-label">Timezone</span><strong class="map-info-value" id="map-timezone">-</strong></div>
+      </div>
+    </section>
+
     <p class="api-note">Powered by OpenWeather's free Current Weather and 5-day Forecast APIs.</p>
   </main>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     // Replace this placeholder with your OpenWeather API key before using the dashboard.
     const OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_API_KEY";
@@ -335,6 +437,9 @@
     const searchButton = document.getElementById("search-button");
     const locationButton = document.getElementById("location-button");
     const unitButton = document.getElementById("unit-button");
+    const mapWeatherButton = document.getElementById("map-weather-button");
+    const mapSearchForm = document.getElementById("map-search-form");
+    const mapSearchInput = document.getElementById("map-search-input");
     const message = document.getElementById("message");
     const weatherContent = document.getElementById("weather-content");
     const forecastElement = document.getElementById("forecast");
@@ -350,10 +455,22 @@
     const pressure = document.getElementById("pressure");
     const visibility = document.getElementById("visibility");
     const uvIndex = document.getElementById("uv-index");
+    const mapPlace = document.getElementById("map-place");
+    const mapCountry = document.getElementById("map-country");
+    const mapCoordinates = document.getElementById("map-coordinates");
+    const mapTimezone = document.getElementById("map-timezone");
     let displayUnit = "C";
     let currentWeather = null;
     let currentForecast = null;
     let currentTimezoneOffset = 0;
+    let selectedMapLocation = null;
+
+    const map = L.map("map").setView([28.6139, 77.2090], 5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+    const mapMarker = L.marker([28.6139, 77.2090], { draggable: true }).addTo(map);
 
     const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const formatTemperature = (value) => {
@@ -387,6 +504,12 @@
     }).format(new Date((timestamp + offset) * 1000));
     const dateKey = (timestamp, offset) => new Date((timestamp + offset) * 1000)
       .toISOString().slice(0, 10);
+    const utcOffset = (seconds) => {
+      const sign = seconds >= 0 ? "+" : "-";
+      const hours = Math.floor(Math.abs(seconds) / 3600).toString().padStart(2, "0");
+      const minutes = Math.floor((Math.abs(seconds) % 3600) / 60).toString().padStart(2, "0");
+      return `UTC${sign}${hours}:${minutes}`;
+    };
 
     async function getJson(url) {
       const response = await fetch(url);
@@ -395,6 +518,38 @@
         throw new Error(data.message || "Weather request failed");
       }
       return data;
+    }
+
+    function updateMapInfo(location, latitude, longitude) {
+      selectedMapLocation = { location, latitude, longitude };
+      const address = location.address || {};
+      mapPlace.textContent = address.city || address.town || address.village || location.name || "Selected location";
+      mapCountry.textContent = [address.state, address.country].filter(Boolean).join(", ") || "-";
+      mapCoordinates.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      mapTimezone.textContent = "Load weather for UTC offset";
+    }
+
+    async function selectMapLocation(latitude, longitude, zoom = 12) {
+      mapMarker.setLatLng([latitude, longitude]);
+      map.setView([latitude, longitude], Math.max(map.getZoom(), zoom));
+      mapPlace.textContent = "Loading location...";
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+        const location = await getJson(url);
+        updateMapInfo(location, latitude, longitude);
+      } catch (error) {
+        mapPlace.textContent = "Location details unavailable";
+        mapCoordinates.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      }
+    }
+
+    async function searchMapLocation(query) {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`;
+      const results = await getJson(url);
+      if (!results.length) throw new Error("Map location not found.");
+      const result = results[0];
+      await selectMapLocation(Number(result.lat), Number(result.lon), 13);
     }
 
     function renderForecast(forecast, timezoneOffset) {
@@ -455,6 +610,7 @@
       pressure.textContent = `${current.main.pressure} hPa`;
       visibility.textContent = `${(current.visibility / 1000).toFixed(1)} km`;
       uvIndex.textContent = "Unavailable";
+      mapTimezone.textContent = utcOffset(forecast.city.timezone);
       renderForecast(forecast, forecast.city.timezone);
       weatherContent.hidden = false;
     }
@@ -545,7 +701,42 @@
       });
     });
 
+    map.on("click", (event) => {
+      selectMapLocation(event.latlng.lat, event.latlng.lng);
+    });
+
+    mapMarker.on("dragend", () => {
+      const position = mapMarker.getLatLng();
+      selectMapLocation(position.lat, position.lng);
+    });
+
+    mapSearchForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const query = mapSearchInput.value.trim();
+      if (!query) return;
+      try {
+        await searchMapLocation(query);
+        message.textContent = "";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    mapWeatherButton.addEventListener("click", async () => {
+      if (!selectedMapLocation) {
+        message.textContent = "Select a location on the map first.";
+        return;
+      }
+      try {
+        await loadWeatherByCoordinates(selectedMapLocation.latitude, selectedMapLocation.longitude);
+        message.textContent = "Weather loaded for the selected map location.";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
     form.requestSubmit();
+    selectMapLocation(28.6139, 77.2090, 5);
   </script>
 </body>
 </html>
