@@ -249,7 +249,7 @@
         <p class="tagline">Real-time conditions and your next seven days.</p>
       </div>
       <form class="search" id="search-form">
-        <input id="city-input" type="search" placeholder="Search a city" value="Delhi" required>
+        <input id="city-input" type="search" placeholder="Search a city" value="Hapur, IN" required>
         <button id="search-button" type="submit">Search</button>
       </form>
     </header>
@@ -311,6 +311,27 @@
 
     const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const celsius = (value) => `${Math.round(value)}°C`;
+    const stateCodes = {
+      "Andhra Pradesh": "AP",
+      "Delhi": "DL",
+      "Gujarat": "GJ",
+      "Haryana": "HR",
+      "Karnataka": "KA",
+      "Kerala": "KL",
+      "Madhya Pradesh": "MP",
+      "Maharashtra": "MH",
+      "Odisha": "OD",
+      "Punjab": "PB",
+      "Rajasthan": "RJ",
+      "Tamil Nadu": "TN",
+      "Telangana": "TG",
+      "Uttar Pradesh": "UP",
+      "Uttarakhand": "UK",
+      "West Bengal": "WB"
+    };
+    const stateCode = (state) => stateCodes[state] || (state
+      ? state.split(/\s+/).map((word) => word[0]).join("").slice(0, 3).toUpperCase()
+      : "");
     const dayName = (timestamp, offset) => new Intl.DateTimeFormat("en-US", {
       weekday: "short",
       timeZone: "UTC"
@@ -360,7 +381,8 @@
 
     function renderWeather(current, forecast, location) {
       const weather = current.weather[0];
-      place.textContent = `${location.name}, ${location.country}`;
+      const state = stateCode(location.state);
+      place.textContent = `${location.name}${state ? ` (${state})` : ""}, ${location.country}`;
       updated.textContent = `Updated ${new Date(current.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
       currentIcon.src = iconUrl(weather.icon);
       currentIcon.alt = weather.description;
@@ -416,4 +438,5 @@
   </script>
 </body>
 </html>
+
 
