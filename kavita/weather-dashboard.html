@@ -63,6 +63,28 @@
       width: min(100%, 390px);
     }
 
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tool-button,
+    .quick-city {
+      padding: 8px 12px;
+      color: var(--blue);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      font-size: 0.85rem;
+    }
+
+    .tool-button:hover,
+    .quick-city:hover {
+      color: #ffffff;
+      background: var(--blue);
+    }
+
     input,
     button {
       padding: 12px 14px;
@@ -187,6 +209,14 @@
     .forecast-card {
       padding: 16px 10px;
       text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .forecast-card:hover,
+    .forecast-card.selected {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(22, 119, 200, 0.16);
     }
 
     .forecast-day {
@@ -246,15 +276,25 @@
     <header>
       <div>
         <h1>Kavita's Weather</h1>
-        <p class="tagline">Real-time conditions and your next seven days.</p>
+        <p class="tagline">Real-time conditions and your next five days.</p>
       </div>
       <form class="search" id="search-form">
         <input id="city-input" type="search" placeholder="Search a city" value="Hapur, IN" required>
         <button id="search-button" type="submit">Search</button>
       </form>
+      <div class="tools">
+        <button class="tool-button" id="location-button" type="button">Use my location</button>
+        <button class="tool-button" id="unit-button" type="button">Switch to °F</button>
+      </div>
     </header>
 
     <p class="message" id="message" aria-live="polite"></p>
+    <div class="tools" aria-label="Popular cities">
+      <button class="quick-city" type="button" data-city="Hapur, IN">Hapur</button>
+      <button class="quick-city" type="button" data-city="Delhi, IN">Delhi</button>
+      <button class="quick-city" type="button" data-city="Mumbai, IN">Mumbai</button>
+      <button class="quick-city" type="button" data-city="Bengaluru, IN">Bengaluru</button>
+    </div>
 
     <section class="weather-content" id="weather-content" hidden>
       <div class="current">
@@ -293,6 +333,8 @@
     const form = document.getElementById("search-form");
     const cityInput = document.getElementById("city-input");
     const searchButton = document.getElementById("search-button");
+    const locationButton = document.getElementById("location-button");
+    const unitButton = document.getElementById("unit-button");
     const message = document.getElementById("message");
     const weatherContent = document.getElementById("weather-content");
     const forecastElement = document.getElementById("forecast");
@@ -308,9 +350,16 @@
     const pressure = document.getElementById("pressure");
     const visibility = document.getElementById("visibility");
     const uvIndex = document.getElementById("uv-index");
+    let displayUnit = "C";
+    let currentWeather = null;
+    let currentForecast = null;
+    let currentTimezoneOffset = 0;
 
     const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
-    const celsius = (value) => `${Math.round(value)}°C`;
+    const formatTemperature = (value) => {
+      const converted = displayUnit === "C" ? value : (value * 9 / 5) + 32;
+      return `${Math.round(converted)}°${displayUnit}`;
+    };
     const stateCodes = {
       "Andhra Pradesh": "AP",
       "Delhi": "DL",
@@ -373,22 +422,34 @@
         <article class="forecast-card">
           <div class="forecast-day">${dayName(day.item.dt, timezoneOffset)}</div>
           <img src="${iconUrl(day.item.weather[0].icon)}" alt="${day.item.weather[0].description}">
-          <div class="forecast-temp">${celsius(day.max)} / ${celsius(day.min)}</div>
+          <div class="forecast-temp">${formatTemperature(day.max)} / ${formatTemperature(day.min)}</div>
           <div class="forecast-rain">Rain ${Math.round(day.rain * 100)}%</div>
         </article>
       `).join("");
+
+      forecastElement.querySelectorAll(".forecast-card").forEach((card, index) => {
+        card.addEventListener("click", () => {
+          forecastElement.querySelectorAll(".forecast-card").forEach((item) => item.classList.remove("selected"));
+          card.classList.add("selected");
+          const day = [...groups.values()][index];
+          message.textContent = `${dayName(day.item.dt, timezoneOffset)}: ${day.item.weather[0].description}, high ${formatTemperature(day.max)}, low ${formatTemperature(day.min)}.`;
+        });
+      });
     }
 
     function renderWeather(current, forecast, location) {
+      currentWeather = current;
+      currentForecast = forecast;
+      currentTimezoneOffset = forecast.city.timezone;
       const weather = current.weather[0];
       const state = stateCode(location.state);
       place.textContent = `${location.name}${state ? ` (${state})` : ""}, ${location.country}`;
       updated.textContent = `Updated ${new Date(current.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
       currentIcon.src = iconUrl(weather.icon);
       currentIcon.alt = weather.description;
-      temperature.textContent = celsius(current.temp);
+      temperature.textContent = formatTemperature(current.temp);
       summary.textContent = weather.description;
-      feelsLike.textContent = celsius(current.feels_like);
+      feelsLike.textContent = formatTemperature(current.feels_like);
       humidity.textContent = `${current.humidity}%`;
       wind.textContent = `${Math.round(current.wind.speed * 3.6)} km/h`;
       pressure.textContent = `${current.pressure} hPa`;
@@ -416,6 +477,26 @@
       renderWeather(current, forecast, location);
     }
 
+    function redrawTemperature() {
+      if (!currentWeather || !currentForecast) return;
+      temperature.textContent = formatTemperature(currentWeather.temp);
+      feelsLike.textContent = formatTemperature(currentWeather.feels_like);
+      renderForecast(currentForecast, currentTimezoneOffset);
+      unitButton.textContent = displayUnit === "C" ? "Switch to °F" : "Switch to °C";
+    }
+
+    async function loadWeatherByCoordinates(latitude, longitude) {
+      const reverseUrl = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
+      const locations = await getJson(reverseUrl);
+      if (!locations.length) throw new Error("Could not identify your location.");
+      const location = locations[0];
+      const query = `lat=${latitude}&lon=${longitude}&units=metric&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
+      const current = await getJson(`https://api.openweathermap.org/data/2.5/weather?${query}`);
+      const forecast = await getJson(`https://api.openweathermap.org/data/2.5/forecast?${query}`);
+      cityInput.value = `${location.name}, ${location.country}`;
+      renderWeather(current, forecast, location);
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const city = cityInput.value.trim();
@@ -432,6 +513,36 @@
       } finally {
         searchButton.disabled = false;
       }
+    });
+
+    unitButton.addEventListener("click", () => {
+      displayUnit = displayUnit === "C" ? "F" : "C";
+      redrawTemperature();
+    });
+
+    locationButton.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        message.textContent = "Location access is not supported by this browser.";
+        return;
+      }
+      message.textContent = "Finding your location...";
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          await loadWeatherByCoordinates(position.coords.latitude, position.coords.longitude);
+          message.textContent = "";
+        } catch (error) {
+          message.textContent = error.message;
+        }
+      }, () => {
+        message.textContent = "Location permission was denied.";
+      });
+    });
+
+    document.querySelectorAll(".quick-city").forEach((button) => {
+      button.addEventListener("click", () => {
+        cityInput.value = button.dataset.city;
+        form.requestSubmit();
+      });
     });
 
     form.requestSubmit();
