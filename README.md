@@ -15,7 +15,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Aakib | `aakib/quiz.html` | Quiz |
 | Deepak | `deepak/unit-converter.html` | Unit converter |
 | Lalit | `lalit/pomodoro-timer.html` | Pomodoro timer with multiple focus durations |
-| Kavita | `kavita/calculator.html` | Nova calculator with keyboard support and history |
+| Kavita | `kavita/weather-dashboard.html` | OpenWeather dashboard with current conditions and 7-day forecast |
 
 ## How to use
 

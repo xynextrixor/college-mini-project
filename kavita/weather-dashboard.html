@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kavita - Weather Dashboard</title>
+  <style>
+    :root {
+      --navy: #102a43;
+      --blue: #1677c8;
+      --sky: #e8f5ff;
+      --card: rgba(255, 255, 255, 0.9);
+      --muted: #627d98;
+      --line: #d9eaf7;
+      --warning: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 28px 16px;
+      color: var(--navy);
+      background: linear-gradient(145deg, #cceeff, #f8fcff 54%, #d7efff);
+      font: 16px Arial, sans-serif;
+    }
+
+    .dashboard {
+      width: min(100%, 1120px);
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    .tagline {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .search {
+      display: flex;
+      gap: 8px;
+      width: min(100%, 390px);
+    }
+
+    input,
+    button {
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    input {
+      min-width: 0;
+      flex: 1;
+      border: 2px solid var(--line);
+      background: #ffffff;
+    }
+
+    button {
+      color: #ffffff;
+      background: var(--blue);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0e5fa5;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .message {
+      min-height: 24px;
+      color: var(--warning);
+      font-weight: 700;
+    }
+
+    .weather-content[hidden] {
+      display: none;
+    }
+
+    .current {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .hero,
+    .stat,
+    .forecast-card {
+      padding: 22px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(16, 42, 67, 0.08);
+    }
+
+    .hero {
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .place {
+      margin-bottom: 3px;
+      font-size: 1.7rem;
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .temperature {
+      margin: 14px 0 2px;
+      font-size: clamp(4rem, 10vw, 6.5rem);
+      font-weight: 700;
+      letter-spacing: -5px;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 1.15rem;
+      text-transform: capitalize;
+    }
+
+    .weather-icon {
+      float: right;
+      width: 90px;
+      height: 90px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-label {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .section-heading {
+      margin: 26px 0 12px;
+    }
+
+    .forecast {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .forecast-card {
+      padding: 16px 10px;
+      text-align: center;
+    }
+
+    .forecast-day {
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .forecast-card img {
+      width: 52px;
+      height: 52px;
+    }
+
+    .forecast-temp {
+      margin: 5px 0;
+      font-weight: 700;
+    }
+
+    .forecast-rain {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .api-note {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 850px) {
+      header {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search {
+        width: 100%;
+      }
+
+      .forecast {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .current {
+        grid-template-columns: 1fr;
+      }
+
+      .forecast {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="dashboard">
+    <header>
+      <div>
+        <h1>Kavita's Weather</h1>
+        <p class="tagline">Real-time conditions and your next seven days.</p>
+      </div>
+      <form class="search" id="search-form">
+        <input id="city-input" type="search" placeholder="Search a city" value="Delhi" required>
+        <button id="search-button" type="submit">Search</button>
+      </form>
+    </header>
+
+    <p class="message" id="message" aria-live="polite"></p>
+
+    <section class="weather-content" id="weather-content" hidden>
+      <div class="current">
+        <article class="hero">
+          <div>
+            <img class="weather-icon" id="current-icon" alt="">
+            <h2 class="place" id="place"></h2>
+            <p class="updated" id="updated"></p>
+          </div>
+          <div>
+            <div class="temperature" id="temperature"></div>
+            <p class="summary" id="summary"></p>
+          </div>
+        </article>
+
+        <div class="stats">
+          <article class="stat"><p class="stat-label">Feels like</p><div class="stat-value" id="feels-like"></div></article>
+          <article class="stat"><p class="stat-label">Humidity</p><div class="stat-value" id="humidity"></div></article>
+          <article class="stat"><p class="stat-label">Wind speed</p><div class="stat-value" id="wind"></div></article>
+          <article class="stat"><p class="stat-label">Pressure</p><div class="stat-value" id="pressure"></div></article>
+          <article class="stat"><p class="stat-label">Visibility</p><div class="stat-value" id="visibility"></div></article>
+          <article class="stat"><p class="stat-label">UV index</p><div class="stat-value" id="uv-index"></div></article>
+        </div>
+      </div>
+
+      <h2 class="section-heading">7-day forecast</h2>
+      <div class="forecast" id="forecast"></div>
+    </section>
+
+    <p class="api-note">Powered by OpenWeather. Add your key in <code>OPENWEATHER_API_KEY</code> in this file.</p>
+  </main>
+
+  <script>
+    // Replace this placeholder with your OpenWeather API key before using the dashboard.
+    const OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_API_KEY";
+    const form = document.getElementById("search-form");
+    const cityInput = document.getElementById("city-input");
+    const searchButton = document.getElementById("search-button");
+    const message = document.getElementById("message");
+    const weatherContent = document.getElementById("weather-content");
+    const forecastElement = document.getElementById("forecast");
+
+    const currentIcon = document.getElementById("current-icon");
+    const place = document.getElementById("place");
+    const updated = document.getElementById("updated");
+    const temperature = document.getElementById("temperature");
+    const summary = document.getElementById("summary");
+    const feelsLike = document.getElementById("feels-like");
+    const humidity = document.getElementById("humidity");
+    const wind = document.getElementById("wind");
+    const pressure = document.getElementById("pressure");
+    const visibility = document.getElementById("visibility");
+    const uvIndex = document.getElementById("uv-index");
+
+    const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    const celsius = (value) => `${Math.round(value)}°C`;
+    const dayName = (timestamp, timezone) => new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: timezone
+    }).format(new Date(timestamp * 1000));
+
+    async function getJson(url) {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Weather request failed");
+      }
+      return data;
+    }
+
+    function renderForecast(days, timezone) {
+      forecastElement.innerHTML = days.slice(0, 7).map((day) => `
+        <article class="forecast-card">
+          <div class="forecast-day">${dayName(day.dt, timezone)}</div>
+          <img src="${iconUrl(day.weather[0].icon)}" alt="${day.weather[0].description}">
+          <div class="forecast-temp">${celsius(day.temp.max)} / ${celsius(day.temp.min)}</div>
+          <div class="forecast-rain">Rain ${Math.round((day.pop || 0) * 100)}%</div>
+        </article>
+      `).join("");
+    }
+
+    function renderWeather(data, location) {
+      const current = data.current;
+      const weather = current.weather[0];
+      place.textContent = `${location.name}, ${location.country}`;
+      updated.textContent = `Updated ${new Date(current.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      currentIcon.src = iconUrl(weather.icon);
+      currentIcon.alt = weather.description;
+      temperature.textContent = celsius(current.temp);
+      summary.textContent = weather.description;
+      feelsLike.textContent = celsius(current.feels_like);
+      humidity.textContent = `${current.humidity}%`;
+      wind.textContent = `${Math.round(current.wind_speed * 3.6)} km/h`;
+      pressure.textContent = `${current.pressure} hPa`;
+      visibility.textContent = `${(current.visibility / 1000).toFixed(1)} km`;
+      uvIndex.textContent = current.uvi.toFixed(1);
+      renderForecast(data.daily, data.timezone);
+      weatherContent.hidden = false;
+    }
+
+    async function loadWeather(city) {
+      if (OPENWEATHER_API_KEY === "YOUR_OPENWEATHER_API_KEY") {
+        throw new Error("Add your OpenWeather API key in the HTML file first.");
+      }
+
+      const locationUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
+      const locations = await getJson(locationUrl);
+      if (!locations.length) {
+        throw new Error("City not found.");
+      }
+
+      const location = locations[0];
+      const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.lon}&exclude=minutely,hourly,alerts&units=metric&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
+      const data = await getJson(weatherUrl);
+      renderWeather(data, location);
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const city = cityInput.value.trim();
+      if (!city) return;
+
+      message.textContent = "Loading live weather...";
+      searchButton.disabled = true;
+      try {
+        await loadWeather(city);
+        message.textContent = "";
+      } catch (error) {
+        weatherContent.hidden = true;
+        message.textContent = error.message;
+      } finally {
+        searchButton.disabled = false;
+      }
+    });
+
+    form.requestSubmit();
+  </script>
+</body>
+</html>
