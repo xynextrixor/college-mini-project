@@ -447,12 +447,12 @@
       updated.textContent = `Updated ${new Date(current.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
       currentIcon.src = iconUrl(weather.icon);
       currentIcon.alt = weather.description;
-      temperature.textContent = formatTemperature(current.temp);
+      temperature.textContent = formatTemperature(current.main.temp);
       summary.textContent = weather.description;
-      feelsLike.textContent = formatTemperature(current.feels_like);
-      humidity.textContent = `${current.humidity}%`;
+      feelsLike.textContent = formatTemperature(current.main.feels_like);
+      humidity.textContent = `${current.main.humidity}%`;
       wind.textContent = `${Math.round(current.wind.speed * 3.6)} km/h`;
-      pressure.textContent = `${current.pressure} hPa`;
+      pressure.textContent = `${current.main.pressure} hPa`;
       visibility.textContent = `${(current.visibility / 1000).toFixed(1)} km`;
       uvIndex.textContent = "Unavailable";
       renderForecast(forecast, forecast.city.timezone);
@@ -479,8 +479,8 @@
 
     function redrawTemperature() {
       if (!currentWeather || !currentForecast) return;
-      temperature.textContent = formatTemperature(currentWeather.temp);
-      feelsLike.textContent = formatTemperature(currentWeather.feels_like);
+      temperature.textContent = formatTemperature(currentWeather.main.temp);
+      feelsLike.textContent = formatTemperature(currentWeather.main.feels_like);
       renderForecast(currentForecast, currentTimezoneOffset);
       unitButton.textContent = displayUnit === "C" ? "Switch to °F" : "Switch to °C";
     }
@@ -549,5 +549,6 @@
   </script>
 </body>
 </html>
+
 
 
