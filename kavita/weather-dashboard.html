@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -280,11 +280,11 @@
         </div>
       </div>
 
-      <h2 class="section-heading">7-day forecast</h2>
+      <h2 class="section-heading">5-day forecast</h2>
       <div class="forecast" id="forecast"></div>
     </section>
 
-    <p class="api-note">Powered by OpenWeather. Add your key in <code>OPENWEATHER_API_KEY</code> in this file.</p>
+    <p class="api-note">Powered by OpenWeather's free Current Weather and 5-day Forecast APIs.</p>
   </main>
 
   <script>
@@ -311,10 +311,12 @@
 
     const iconUrl = (icon) => `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const celsius = (value) => `${Math.round(value)}°C`;
-    const dayName = (timestamp, timezone) => new Intl.DateTimeFormat("en-US", {
+    const dayName = (timestamp, offset) => new Intl.DateTimeFormat("en-US", {
       weekday: "short",
-      timeZone: timezone
-    }).format(new Date(timestamp * 1000));
+      timeZone: "UTC"
+    }).format(new Date((timestamp + offset) * 1000));
+    const dateKey = (timestamp, offset) => new Date((timestamp + offset) * 1000)
+      .toISOString().slice(0, 10);
 
     async function getJson(url) {
       const response = await fetch(url);
@@ -325,19 +327,38 @@
       return data;
     }
 
-    function renderForecast(days, timezone) {
-      forecastElement.innerHTML = days.slice(0, 7).map((day) => `
+    function renderForecast(forecast, timezoneOffset) {
+      const groups = new Map();
+      forecast.list.forEach((item) => {
+        const key = dateKey(item.dt, timezoneOffset);
+        const day = groups.get(key) || {
+          dt: item.dt,
+          min: item.main.temp_min,
+          max: item.main.temp_max,
+          rain: 0,
+          item
+        };
+        day.min = Math.min(day.min, item.main.temp_min);
+        day.max = Math.max(day.max, item.main.temp_max);
+        day.rain = Math.max(day.rain, item.pop || 0);
+        if (Math.abs(new Date(item.dt * 1000).getUTCHours() - 12) <
+            Math.abs(new Date(day.item.dt * 1000).getUTCHours() - 12)) {
+          day.item = item;
+        }
+        groups.set(key, day);
+      });
+
+      forecastElement.innerHTML = [...groups.values()].slice(0, 5).map((day) => `
         <article class="forecast-card">
-          <div class="forecast-day">${dayName(day.dt, timezone)}</div>
-          <img src="${iconUrl(day.weather[0].icon)}" alt="${day.weather[0].description}">
-          <div class="forecast-temp">${celsius(day.temp.max)} / ${celsius(day.temp.min)}</div>
-          <div class="forecast-rain">Rain ${Math.round((day.pop || 0) * 100)}%</div>
+          <div class="forecast-day">${dayName(day.item.dt, timezoneOffset)}</div>
+          <img src="${iconUrl(day.item.weather[0].icon)}" alt="${day.item.weather[0].description}">
+          <div class="forecast-temp">${celsius(day.max)} / ${celsius(day.min)}</div>
+          <div class="forecast-rain">Rain ${Math.round(day.rain * 100)}%</div>
         </article>
       `).join("");
     }
 
-    function renderWeather(data, location) {
-      const current = data.current;
+    function renderWeather(current, forecast, location) {
       const weather = current.weather[0];
       place.textContent = `${location.name}, ${location.country}`;
       updated.textContent = `Updated ${new Date(current.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
@@ -347,11 +368,11 @@
       summary.textContent = weather.description;
       feelsLike.textContent = celsius(current.feels_like);
       humidity.textContent = `${current.humidity}%`;
-      wind.textContent = `${Math.round(current.wind_speed * 3.6)} km/h`;
+      wind.textContent = `${Math.round(current.wind.speed * 3.6)} km/h`;
       pressure.textContent = `${current.pressure} hPa`;
       visibility.textContent = `${(current.visibility / 1000).toFixed(1)} km`;
-      uvIndex.textContent = current.uvi.toFixed(1);
-      renderForecast(data.daily, data.timezone);
+      uvIndex.textContent = "Unavailable";
+      renderForecast(forecast, forecast.city.timezone);
       weatherContent.hidden = false;
     }
 
@@ -367,9 +388,10 @@
       }
 
       const location = locations[0];
-      const weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.lon}&exclude=minutely,hourly,alerts&units=metric&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
-      const data = await getJson(weatherUrl);
-      renderWeather(data, location);
+      const query = `lat=${location.lat}&lon=${location.lon}&units=metric&appid=${encodeURIComponent(OPENWEATHER_API_KEY)}`;
+      const current = await getJson(`https://api.openweathermap.org/data/2.5/weather?${query}`);
+      const forecast = await getJson(`https://api.openweathermap.org/data/2.5/forecast?${query}`);
+      renderWeather(current, forecast, location);
     }
 
     form.addEventListener("submit", async (event) => {
@@ -394,3 +416,4 @@
   </script>
 </body>
 </html>
+
