@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deepak - To-Do List</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #718096;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --surface: #ffffff;
+      --background: #eef4ff;
+      --line: #dbe5f5;
+      --danger: #dc2626;
+      --green: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      background: linear-gradient(145deg, #dfeaff, var(--background));
+      font: 16px Arial, sans-serif;
+    }
+
+    .app {
+      width: min(100%, 620px);
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid #e7edfa;
+      border-radius: 22px;
+      box-shadow: 0 22px 55px rgba(37, 99, 235, 0.14);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .progress {
+      min-width: 78px;
+      padding: 10px;
+      text-align: center;
+      color: var(--blue-dark);
+      background: #eaf1ff;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .task-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      min-width: 0;
+      flex: 1;
+      padding: 13px 14px;
+      border: 2px solid var(--line);
+      border-radius: 11px;
+      font: inherit;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    button {
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 10px;
+      color: #ffffff;
+      background: var(--blue);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--blue-dark);
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter {
+      color: var(--muted);
+      background: #f4f7fc;
+    }
+
+    .filter.active {
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 58px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    .task-item.completed .task-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .task-item.completed {
+      background: #f7fafc;
+    }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+
+    .task-text {
+      overflow-wrap: anywhere;
+    }
+
+    .delete-button {
+      padding: 8px 10px;
+      color: var(--danger);
+      background: #fff1f2;
+      font-size: 0.82rem;
+    }
+
+    .delete-button:hover {
+      color: #ffffff;
+      background: var(--danger);
+    }
+
+    .empty {
+      padding: 28px 12px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 18px;
+      }
+
+      .header {
+        align-items: flex-start;
+      }
+
+      .task-form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="header">
+      <div>
+        <h1>Deepak's Tasks</h1>
+        <p class="subtitle">Organize your day, one task at a time.</p>
+      </div>
+      <div class="progress" id="progress">0 / 0</div>
+    </div>
+
+    <form class="task-form" id="task-form">
+      <input id="task-input" type="text" placeholder="What needs to be done?" maxlength="120" required>
+      <button type="submit">Add task</button>
+    </form>
+
+    <div class="filters" aria-label="Task filters">
+      <button class="filter active" type="button" data-filter="all">All</button>
+      <button class="filter" type="button" data-filter="active">Active</button>
+      <button class="filter" type="button" data-filter="completed">Completed</button>
+    </div>
+
+    <ul class="task-list" id="task-list"></ul>
+  </main>
+
+  <script>
+    const taskForm = document.getElementById("task-form");
+    const taskInput = document.getElementById("task-input");
+    const taskList = document.getElementById("task-list");
+    const progress = document.getElementById("progress");
+    const filterButtons = document.querySelectorAll(".filter");
+
+    let tasks = JSON.parse(localStorage.getItem("deepakTasks") || "[]");
+    let currentFilter = "all";
+
+    function saveTasks() {
+      localStorage.setItem("deepakTasks", JSON.stringify(tasks));
+    }
+
+    function escapeText(text) {
+      const element = document.createElement("span");
+      element.textContent = text;
+      return element.innerHTML;
+    }
+
+    function renderTasks() {
+      const visibleTasks = tasks.filter((task) => {
+        if (currentFilter === "active") return !task.completed;
+        if (currentFilter === "completed") return task.completed;
+        return true;
+      });
+
+      const completedCount = tasks.filter((task) => task.completed).length;
+      progress.textContent = `${completedCount} / ${tasks.length}`;
+
+      if (!visibleTasks.length) {
+        taskList.innerHTML = '<li class="empty">No tasks to show.</li>';
+        return;
+      }
+
+      taskList.innerHTML = visibleTasks.map((task) => `
+        <li class="task-item ${task.completed ? "completed" : ""}" data-id="${task.id}">
+          <input class="task-checkbox" type="checkbox" ${task.completed ? "checked" : ""} aria-label="Mark task complete">
+          <span class="task-text">${escapeText(task.text)}</span>
+          <button class="delete-button" type="button">Delete</button>
+        </li>
+      `).join("");
+    }
+
+    taskForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = taskInput.value.trim();
+      if (!text) return;
+
+      tasks.unshift({
+        id: Date.now(),
+        text,
+        completed: false
+      });
+      taskInput.value = "";
+      saveTasks();
+      renderTasks();
+    });
+
+    taskList.addEventListener("change", (event) => {
+      if (!event.target.classList.contains("task-checkbox")) return;
+      const item = event.target.closest(".task-item");
+      const task = tasks.find((entry) => entry.id === Number(item.dataset.id));
+      if (!task) return;
+      task.completed = event.target.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    taskList.addEventListener("click", (event) => {
+      if (!event.target.classList.contains("delete-button")) return;
+      const item = event.target.closest(".task-item");
+      tasks = tasks.filter((task) => task.id !== Number(item.dataset.id));
+      saveTasks();
+      renderTasks();
+    });
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        filterButtons.forEach((filter) => filter.classList.remove("active"));
+        button.classList.add("active");
+        currentFilter = button.dataset.filter;
+        renderTasks();
+      });
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>

@@ -1,42 +1,36 @@
-# Deepak Unit Converter
+# Deepak To-Do List
 
 ## Project overview
-A unit converter for kilometers, miles, kilograms, pounds, and Celsius/Fahrenheit.
+A persistent browser to-do list for adding, completing, filtering, and deleting tasks.
 
 ## Run in VS Code
-1. Open `deepak/unit-converter.html`.
+1. Open `deepak/todo-list.html`.
 2. Right-click and select **Open with Live Server**.
-3. Enter a number, select a conversion, and choose **Convert**.
+3. Enter a task and choose **Add task**.
 
-To copy: create `deepak/unit-converter.html`, paste the full code, save, and run.
+To copy: create `deepak/todo-list.html`, paste the full code, save, and run.
 
 ## How it works
-- The number input supplies the value.
-- The dropdown supplies the conversion type.
-- JavaScript reads both values.
-- A conversion object contains formulas and output units.
-- `.toFixed(2)` formats the result to two decimal places.
-- Invalid empty input displays an instruction instead of converting.
-
-## Conversion formulas
-- Kilometers to miles: `km * 0.621371`
-- Miles to kilometers: `miles * 1.60934`
-- Kilograms to pounds: `kg * 2.20462`
-- Celsius to Fahrenheit: `(C * 9 / 5) + 32`
+- Form submission creates a task object.
+- Tasks are saved in browser `localStorage`.
+- Checkbox changes update completed status.
+- Filters show all, active, or completed tasks.
+- Delete removes a task and updates storage.
+- The progress display shows completed tasks over total tasks.
 
 ## Viva questions
 
-**Q1. What is a unit converter?**
-It is a program that changes a quantity from one measurement unit to another.
+**Q1. What is `localStorage`?**
+It is browser storage that keeps key/value data after the page is closed.
 
-**Q2. Why is `Number()` used?**
-It converts the input string into a number.
+**Q2. Why use JSON serialization?**
+It converts the JavaScript task array into a string for storage and back into an array when loaded.
 
-**Q3. Why validate empty input?**
-Empty or invalid input should not be processed as a valid calculation.
+**Q3. What is event delegation?**
+It uses one parent listener to handle events from dynamically created task elements.
 
-**Q4. What is `.toFixed(2)`?**
-It converts a number to a fixed decimal format.
+**Q4. How is a task marked completed?**
+Its checkbox changes the `completed` property and the task is re-rendered.
 
-**Q5. Can the project add more units?**
-Yes. Add a dropdown option and a formula to the conversion object.
+**Q5. How can this project use a database?**
+Task operations could call backend APIs that store records in SQLite, MySQL, MongoDB, or another database.

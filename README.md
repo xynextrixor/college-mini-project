@@ -13,7 +13,7 @@ Seven different, beginner-friendly web projects. Each project is a standalone HT
 | Anmol | `anmol/todo-list.html` | To-do list |
 | Satyakam | `satyakam/expense-tracker.html` | Expense tracker |
 | Aakib | `aakib/quiz.html` | Quiz |
-| Deepak | `deepak/unit-converter.html` | Unit converter |
+| Deepak | `deepak/todo-list.html` | Persistent to-do list with filters |
 | Lalit | `lalit/pomodoro-timer.html` | Pomodoro timer with multiple focus durations |
 | Kavita | `kavita/weather-dashboard.html` | OpenWeather dashboard with current conditions and 5-day forecast |
 
