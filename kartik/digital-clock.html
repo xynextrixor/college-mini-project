@@ -119,6 +119,12 @@
       font-size: 0.95rem;
     }
 
+    .timezone {
+      min-height: 20px;
+      color: #41634b;
+      font-size: 0.85rem;
+    }
+
     @media (max-width: 720px) {
       .layout {
         grid-template-columns: 1fr;
@@ -138,6 +144,7 @@
       <div class="time" id="clock" aria-live="polite"></div>
       <p class="date" id="date"></p>
       <p class="location" id="location">Selected location: none</p>
+      <p class="timezone" id="timezone">Timezone: loading...</p>
     </section>
 
     <section class="map-panel">
@@ -159,8 +166,28 @@
     const clockElement = document.getElementById("clock");
     const dateElement = document.getElementById("date");
     const locationElement = document.getElementById("location");
+    const timezoneElement = document.getElementById("timezone");
     const searchInput = document.getElementById("search-input");
     const searchButton = document.getElementById("search-button");
+    let selectedTimezone = "Asia/Kolkata";
+    let worldTime = null;
+    let worldTimeUpdatedAt = 0;
+
+    const countryTimezoneHints = {
+      IN: "Asia/Kolkata",
+      US: "America/New_York",
+      GB: "Europe/London",
+      AU: "Australia/Sydney",
+      JP: "Asia/Tokyo",
+      CN: "Asia/Shanghai",
+      AE: "Asia/Dubai",
+      SG: "Asia/Singapore",
+      FR: "Europe/Paris",
+      DE: "Europe/Berlin",
+      CA: "America/Toronto",
+      BR: "America/Sao_Paulo",
+      ZA: "Africa/Johannesburg"
+    };
 
     const map = L.map("map").setView([20.5937, 78.9629], 4);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -171,9 +198,20 @@
     const marker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(map);
 
     function updateClock() {
-      const now = new Date();
-      clockElement.textContent = now.toLocaleTimeString();
-      dateElement.textContent = now.toLocaleDateString(undefined, {
+      let now = new Date();
+      if (worldTime) {
+        const elapsedSeconds = (Date.now() - worldTimeUpdatedAt) / 1000;
+        now = new Date(new Date(worldTime.datetime).getTime() + elapsedSeconds * 1000);
+      }
+
+      clockElement.textContent = now.toLocaleTimeString("en-US", {
+        timeZone: selectedTimezone,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      dateElement.textContent = now.toLocaleDateString("en-US", {
+        timeZone: selectedTimezone,
         weekday: "long",
         year: "numeric",
         month: "long",
@@ -200,8 +238,58 @@
         }
         const result = await response.json();
         updateLocationLabel(lat, lon, result.display_name);
+        loadLocationTimezone(result.address || {});
       } catch (error) {
         updateLocationLabel(lat, lon);
+      }
+    }
+
+    let timezoneList = null;
+
+    async function loadLocationTimezone(address) {
+      const countryCode = (address.country_code || "").toUpperCase();
+      let timezone = countryTimezoneHints[countryCode] || "UTC";
+
+      try {
+        if (!timezoneList) {
+          const response = await fetch("https://worldtimeapi.org/api/timezone");
+          if (!response.ok) throw new Error("WorldTimeAPI timezone list unavailable");
+          timezoneList = await response.json();
+        }
+
+        const cityName = address.city || address.town || address.village || address.state_district || "";
+        const cityKey = cityName.replace(/[^a-z]/gi, "").toLowerCase();
+        const cityMatch = timezoneList.find((item) => {
+          const zoneCity = item.split("/").pop().replace(/[^a-z]/gi, "").toLowerCase();
+          return cityKey && zoneCity === cityKey;
+        });
+
+        if (cityMatch) {
+          timezone = cityMatch;
+        } else if (!timezoneList.includes(timezone)) {
+          timezone = "UTC";
+        }
+      } catch (error) {
+        timezone = countryTimezoneHints[countryCode] || "UTC";
+      }
+
+      selectedTimezone = timezone;
+      timezoneElement.textContent = `Timezone: ${timezone}`;
+      await loadWorldTime(timezone);
+    }
+
+    async function loadWorldTime(timezone) {
+      try {
+        const response = await fetch(
+          `https://worldtimeapi.org/api/timezone/${timezone.split("/").map(encodeURIComponent).join("/")}`
+        );
+        if (!response.ok) throw new Error("WorldTimeAPI location unavailable");
+        worldTime = await response.json();
+        worldTimeUpdatedAt = Date.now();
+      } catch (error) {
+        worldTime = null;
+        timezoneElement.textContent = `Timezone: ${timezone} (browser fallback)`;
+        updateClock();
       }
     }
 
